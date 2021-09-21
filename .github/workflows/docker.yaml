@@ -1,0 +1,47 @@
+name: dockermatrix
+
+on:
+  push:
+  pull_request:
+  schedule:
+  - cron: "32 2 * * 1"
+    
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    name: ${{matrix.release}}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        release: [bionic, focal, testing]
+    
+    steps:
+    - name: Create Tag
+      run: |
+        rel=${{ matrix.release }}
+        tag=$(echo $rel | awk '/bionic/ { print("18.04") } /focal/ { print("20.04") } /testing/ { print("testing") }')
+        echo "tag=$tag" >> $GITHUB_ENV
+        #see https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    #- name: Set up QEMU
+    #  uses: docker/setup-qemu-action@v1
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Login to DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and push
+      uses: docker/build-push-action@v2
+      with:
+        context: ${{ matrix.release }}
+        push: true
+        tags: rocker/r-bspm:${{ env.tag }}
