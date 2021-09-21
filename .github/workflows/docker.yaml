@@ -18,6 +18,7 @@ jobs:
           - { directory: bionic,  tag: '18.04' }
           - { directory: focal,   tag: '20.04' }
           - { directory: testing, tag: 'testing' }
+          - { directory: fedora,  tag: 'f34' }
         
     steps:
     - name: Checkout
