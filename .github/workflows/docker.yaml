@@ -9,7 +9,7 @@ on:
 jobs:
   docker:
     runs-on: ubuntu-latest
-    name: ${{matrix.release}}
+    name: ${{ matrix.config.tag }}
 
     strategy:
       fail-fast: false
