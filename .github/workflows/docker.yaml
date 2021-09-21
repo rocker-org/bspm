@@ -14,16 +14,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        release: [bionic, focal, testing]
-    
+        config:
+          - { directory: bionic,  tag: '18.04' }
+          - { directory: focal,   tag: '20.04' }
+          - { directory: testing, tag: 'testing' }
+        
     steps:
-    - name: Create Tag
-      run: |
-        rel=${{ matrix.release }}
-        tag=$(echo $rel | awk '/bionic/ { print("18.04") } /focal/ { print("20.04") } /testing/ { print("testing") }')
-        echo "tag=$tag" >> $GITHUB_ENV
-        #see https://stackoverflow.com/questions/57968497/how-do-i-set-an-env-var-with-a-bash-expression-in-github-actions
-
     - name: Checkout
       uses: actions/checkout@v2
 
@@ -42,6 +38,6 @@ jobs:
     - name: Build and push
       uses: docker/build-push-action@v2
       with:
-        context: ${{ matrix.release }}
         push: true
-        tags: rocker/r-bspm:${{ env.tag }}
+        context: ${{ matrix.config.directory }}
+        tags: rocker/r-bspm:${{ matrix.config.tag }}
