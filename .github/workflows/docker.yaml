@@ -9,16 +9,17 @@ on:
 jobs:
   docker:
     runs-on: ubuntu-latest
-    name: ${{ matrix.config.tag }}
+    name: ${{ matrix.tag }}
 
     strategy:
       fail-fast: false
       matrix:
-        config:
-          - { directory: bionic,  tag: '18.04' }
-          - { directory: focal,   tag: '20.04' }
-          - { directory: testing, tag: 'testing' }
-          - { directory: fedora,  tag: 'f34' }
+        include: [
+          { directory: bionic,  tag: '18.04' },
+          { directory: focal,   tag: '20.04' },
+          { directory: testing, tag: 'testing' },
+          { directory: fedora,  tag: 'f34' }
+        ]
         
     steps:
     - name: Checkout
@@ -41,5 +42,5 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: ${{ github.event_name != 'pull_request' }}
-        context: ${{ matrix.config.directory }}
-        tags: rocker/r-bspm:${{ matrix.config.tag }}
+        context: ${{ matrix.directory }}
+        tags: rocker/r-bspm:${{ matrix.tag }}
