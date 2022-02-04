@@ -17,7 +17,7 @@ RUN apt-get update \
                 sudo \
                 r-cran-bspm \
         && echo "bspm::enable()" >> /etc/R/Rprofile.site \
-        && echo "options(bspm.sudo=TRUE)" >> /etc/R/Rprofile.site \
+        && echo "options(bspm.sudo=TRUE,bspm.always.install.deps)" >> /etc/R/Rprofile.site \
         && echo 'APT::Install-Recommends "false";' > /etc/apt/apt.conf.d/90local-no-recommends \
         && echo "docker ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/local-docker-user \
         && rm /etc/apt/sources.list.d/eddelbuettel-ppa.list \
