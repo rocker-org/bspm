@@ -1,4 +1,4 @@
-FROM fedora:34
+FROM fedora:36
 
 LABEL org.label-schema.license="GPL-2.0" \
       org.label-schema.vcs-url="https://github.com/rocker-org/rocker" \
