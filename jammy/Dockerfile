@@ -12,7 +12,7 @@ LABEL org.label-schema.license="GPL-2.0" \
 RUN apt update -qq \
         && install.r bspm \
         && echo "suppressMessages(bspm::enable())" >> /etc/R/Rprofile.site \
-        && echo "options(pkgType=\"binary-source\")" >> /etc/R/Rprofile.site \
+        && echo "options(bspm.version.check=FALSE)" >> /etc/R/Rprofile.site \
         && echo 'APT::Install-Recommends "false";' > /etc/apt/apt.conf.d/90local-no-recommends \
         && chgrp 1000 /usr/local/lib/R/site-library \
         && install.r remotes
