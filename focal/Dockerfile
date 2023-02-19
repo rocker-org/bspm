@@ -9,13 +9,13 @@ LABEL org.label-schema.license="GPL-2.0" \
 ## This was not needed before but we need it now
 #ENV DEBIAN_FRONTEND noninteractive
 
-RUN add-apt-repository --yes "ppa:edd/r-4.0" \
-	&& apt-get install -y --no-install-recommends \
-                r-cran-bspm \
+RUN apt update -qq \
+        && install.r bspm \
         && echo "suppressMessages(bspm::enable())" >> /etc/R/Rprofile.site \
         && echo "options(bspm.version.check=FALSE)" >> /etc/R/Rprofile.site \
         && echo 'APT::Install-Recommends "false";' > /etc/apt/apt.conf.d/90local-no-recommends \
-        && chgrp 1000 /usr/local/lib/R/site-library \
+        && chgrp -R 1000 /usr/local/lib/R/site-library \
+        && chmod -R g+w /usr/local/lib/R/site-library \
         && install.r remotes
 
 CMD ["bash"]
