@@ -9,13 +9,12 @@ LABEL org.label-schema.license="GPL-2.0" \
 ## This was not needed before but we need it now
 #ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt update -qq \
-        && install.r bspm \
+RUN rm -f /etc/apt/sources.list.d/c2d4u*list \
+        && apt update -qq \
+        && install.r bspm remotes \
         && echo "suppressMessages(bspm::enable())" >> /etc/R/Rprofile.site \
         && echo "options(bspm.version.check=FALSE)" >> /etc/R/Rprofile.site \
         && echo 'APT::Install-Recommends "false";' > /etc/apt/apt.conf.d/90local-no-recommends \
-        && chgrp -R 1000 /usr/local/lib/R/site-library \
-        && chmod -R g+w /usr/local/lib/R/site-library \
-        && install.r remotes
+        && chgrp -R 1000 /usr/local/lib/R/site-library
 
 CMD ["bash"]
