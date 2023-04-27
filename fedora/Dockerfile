@@ -1,4 +1,4 @@
-FROM fedora:37
+FROM fedora:38
 
 LABEL org.label-schema.license="GPL-2.0" \
       org.label-schema.vcs-url="https://github.com/rocker-org/rocker" \
@@ -12,7 +12,6 @@ RUN echo "install_weak_deps=False" >> /etc/dnf/dnf.conf \
 # enable copr
 RUN dnf -y install 'dnf-command(copr)' \
     && dnf -y copr enable iucar/cran \
-    && sed -ie '/nodocs/d' /etc/dnf/dnf.conf \
     && dnf -y install R-CoprManager \
     && dnf -y clean all \
     && echo "options(repos='https://cloud.r-project.org')" > \
