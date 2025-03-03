@@ -1,10 +1,11 @@
 name: dockermatrix
 
 on:
-  push:
-  pull_request:
-  schedule:
-  - cron: "32 2 * * 1"
+  #push:
+  #pull_request:
+  #schedule:
+  #- cron: "32 2 * * 1"
+  workflow_dispatch:
     
 jobs:
   docker:
