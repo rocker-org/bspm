@@ -6,8 +6,8 @@ name: docker
 
 on:
   #push:
-  #schedule:
-  #- cron: "32 2 * * 1"
+  schedule:
+  - cron: "22 2 2 * *"
   workflow_dispatch:
 
 jobs:
