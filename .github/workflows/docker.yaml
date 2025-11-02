@@ -1,48 +1,68 @@
-name: dockermatrix
+## Dual build:
+##  - once in (focal,jammy,...) matrix for amd64 only, and
+##  - once (noble) for a dual-platform (arm64, amd64)
+
+name: docker
 
 on:
   #push:
-  #pull_request:
   #schedule:
   #- cron: "32 2 * * 1"
   workflow_dispatch:
-    
-jobs:
-  docker:
-    runs-on: ubuntu-latest
-    name: ${{ matrix.tag }}
 
-    strategy:
-      fail-fast: false
-      matrix:
-        include: [
-          { directory: bionic,  tag: '18.04' },
-          { directory: focal,   tag: '20.04' },
-          { directory: testing, tag: 'testing' },
-          { directory: fedora,  tag: 'f34' },
-          { directory: arch,    tag: 'arch' }
-        ]
-        
+jobs:
+  dual-platform:
+    runs-on: ubuntu-latest
+    name: 24.04 (dual-platform)
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
-
-    #- name: Set up QEMU
-    #  uses: docker/setup-qemu-action@v1
-
+      uses: actions/checkout@v4
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
-
+      uses: docker/setup-buildx-action@v3
     - name: Login to DockerHub
-      if: ${{ github.event_name != 'pull_request' }}
-      uses: docker/login-action@v1
+      uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-
     - name: Build and push
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v6
       with:
-        push: ${{ github.event_name != 'pull_request' }}
-        context: ${{ matrix.directory }}
+        push: true
+        no-cache: true
+        platforms: linux/amd64,linux/arm64
+        context: noble
+        tags: rocker/r-bspm:noble,rocker/r-bspm:24.04,rocker/r-bspm:latest
+
+  matrix:
+    runs-on: ${{ matrix.config.runs }}
+    name: ${{ matrix.config.tag }} (${{ matrix.config.cpu }})
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { directory: focal, tag: '20.04', cpu: amd64, runs: ubuntu-latest }
+          - { directory: jammy, tag: '22.04', cpu: amd64, runs: ubuntu-latest }
+          - { directory: testing, tag: 'testing', cpu: amd64, runs: ubuntu-latest }
+          #- { directory: fedora,  tag: 'f34' },
+          #- { directory: arch,    tag: 'arch' }
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    #- name: Set up QEMU
+    #  uses: docker/setup-qemu-action@v3
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    - name: Login to DockerHub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Build and push
+      uses: docker/build-push-action@v6
+      with:
+        push: true
+        no-cache: true
+        context: ${{ matrix.config.directory }}
         tags: rocker/r-bspm:${{ matrix.tag }}
